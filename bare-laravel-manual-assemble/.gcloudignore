@@ -41,14 +41,10 @@ phpunit.xml
 .DS_Store
 Thumbs.db
 
-# Docker
+# Docker - exclude only specific files, not all Dockerfiles
 docker-compose.yml
 docker-compose.*.yml
 Dockerfile.backup
-
-# Include required files for Cloud Build
-!Dockerfile.cloudrun
-!cloudbuild.yaml
 
 # Documentation (keeping README.md for deployment reference)
 # README.md
