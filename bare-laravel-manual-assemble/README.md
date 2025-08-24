@@ -82,14 +82,12 @@ Supervisordによるプロセス管理設定:
 ### Cloud Build/Deploy
 
 #### `cloudbuild.yaml`
-Cloud Buildの自動ビルド・デプロイ設定:
-1. Dockerイメージのビルド
-2. Container Registryへのプッシュ
-3. Cloud Runへの自動デプロイ
-   - リージョン: asia-northeast1
-   - メモリ: 1Gi
-   - CPU: 2
-   - 自動スケーリング: 0-10インスタンス
+Cloud Buildの自動ビルド・プッシュ設定:
+1. Dockerイメージのビルド（Dockerfile.cloudrun使用）
+2. Artifact Registryへのプッシュ（SHAタグ + latestタグ）
+3. Cloud Runへのデプロイは別途手動またはCI/CDで実行
+
+イメージの保存先: `asia-northeast1-docker.pkg.dev/$PROJECT_ID/laravel-repo/laravel-app`
 
 #### `.gcloudignore`
 Cloud Buildで除外するファイル:
@@ -112,24 +110,43 @@ docker compose up -d
 # http://localhost でアクセス
 ```
 
-### Cloud Runへのデプロイ
+### Cloud Buildでイメージをビルド・プッシュ
 
 ```bash
 # プロジェクトIDの設定
 export PROJECT_ID=your-project-id
 
-# Cloud Buildを使用したデプロイ
-gcloud builds submit --config cloudbuild.yaml
+# Artifact Registryリポジトリの作成（初回のみ）
+gcloud artifacts repositories create laravel-repo \
+  --repository-format=docker \
+  --location=asia-northeast1
 
-# または手動でビルド・デプロイ
-docker build -t gcr.io/$PROJECT_ID/laravel-app -f Dockerfile.cloudrun .
-docker push gcr.io/$PROJECT_ID/laravel-app
+# Cloud Buildでイメージをビルド・プッシュ
+gcloud builds submit --config cloudbuild.yaml
+```
+
+### Cloud Runでデプロイ
+
+```bash
+# Cloud RunでArtifact Registryのイメージをデプロイ
 gcloud run deploy laravel-app \
-  --image gcr.io/$PROJECT_ID/laravel-app \
+  --image asia-northeast1-docker.pkg.dev/$PROJECT_ID/laravel-repo/laravel-app:latest \
   --region asia-northeast1 \
   --platform managed \
   --allow-unauthenticated \
-  --port 8080
+  --port 8080 \
+  --memory 1Gi \
+  --cpu 2 \
+  --max-instances 10 \
+  --min-instances 0 \
+  --set-env-vars APP_ENV=production,APP_DEBUG=false,LOG_CHANNEL=stderr,APP_KEY=base64:$(openssl rand -base64 32)
+
+# または手動でビルド・プッシュ・デプロイ
+docker build -t asia-northeast1-docker.pkg.dev/$PROJECT_ID/laravel-repo/laravel-app -f Dockerfile.cloudrun .
+docker push asia-northeast1-docker.pkg.dev/$PROJECT_ID/laravel-repo/laravel-app
+gcloud run deploy laravel-app \
+  --image asia-northeast1-docker.pkg.dev/$PROJECT_ID/laravel-repo/laravel-app \
+  --region asia-northeast1
 ```
 
 ### Cloud Run用Dockerfileのローカルテスト
