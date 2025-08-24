@@ -1,0 +1,123 @@
+# =============================================================================
+# terraform.tfvars.example - Terraform変数設定例ファイル
+# =============================================================================
+# このファイルは、variables.tfで定義された変数に実際の値を設定するためのサンプルです。
+# 使用方法：
+# 1. このファイルを terraform.tfvars にコピーする
+# 2. 以下の値を実際の環境に合わせて変更する
+# 3. 機密情報（APP_KEYなど）を設定する
+#
+# 注意：terraform.tfvars ファイルには機密情報が含まれるため、Gitにコミットしないでください！
+
+# Google Cloud プロジェクト設定
+# -----------------------------------------------------------------------------
+
+# Google CloudのプロジェクトID（必須）
+# 事前にGoogle Cloud Consoleで作成したプロジェクトのIDを入力してください
+project_id = "playground2"
+
+# デプロイするリージョン（地域）
+# 東京リージョンが推奨ですが、他のリージョンも選択可能です
+# オプション: asia-northeast1(東京), asia-northeast2(大阪), us-central1(アイオワ)など
+region = "asia-northeast1"
+
+# アプリケーション設定
+# -----------------------------------------------------------------------------
+
+# 環境名（開発、ステージング、本番環境の区別）
+# dev: 開発環境, staging: ステージング環境, prod: 本番環境
+environment = "dev"
+
+# アプリケーション名（各リソース名のプレフィックスとして使用）
+# 例: laravel-app → laravel-app-dev-service, laravel-app-repo など
+app_name = "laravel-app"
+
+# GitHub リポジトリ設定（CI/CD用）
+# -----------------------------------------------------------------------------
+
+# GitHubリポジトリの所有者（ユーザー名または組織名）
+github_repo_owner = "kter"
+
+# GitHubリポジトリ名
+github_repo_name = "learning-google-cloud"
+
+# ビルドをトリガーするブランチのパターン（正規表現）
+# ^main$ → mainブランチのみ, ^(main|develop)$ → mainとdevelopブランチ
+github_branch_pattern = "^main$"
+
+# Docker ビルド設定
+# -----------------------------------------------------------------------------
+
+# Dockerfileのパス（リポジトリルートからの相対パス）
+dockerfile_path = "bare-laravel-manual-assemble/Dockerfile.cloudrun"
+
+# ビルドコンテキストのパス（リポジトリルートからの相対パス）
+# Dockerイメージビルド時にコンテキストとして使用されるディレクトリ
+build_context_path = "bare-laravel-manual-assemble"
+
+# Cloud Run 設定（コンテナ実行環境）
+# -----------------------------------------------------------------------------
+
+# CPU割り当て
+# 1000m = 1CPU, 2000m = 2CPU
+# 小規模: 1000m, 中規模: 2000m, 大規模: 4000m
+cloud_run_cpu = "1000m"
+
+# メモリ割り当て
+# 512Mi = 512MB, 1Gi = 1GB, 2Gi = 2GB
+# 小規模: 512Mi, 中規模: 1Gi, 大規模: 2Gi以上
+cloud_run_memory = "512Mi"
+
+# 最大インスタンス数（自動スケーリングの上限）
+# 開発環境: 5-10, ステージング: 20, 本番: 50-100
+cloud_run_max_instances = 10
+
+# 最小インスタンス数（常時起動するインスタンス数）
+# 0: コスト最適化（使用時のみ起動）, 1以上: レスポンス最適化
+cloud_run_min_instances = 0
+
+# セキュリティ設定（重要：機密情報）
+# -----------------------------------------------------------------------------
+
+# Laravel アプリケーションキー（必須、機密情報）
+# 生成方法：
+# 1. Laravel プロジェクトで: php artisan key:generate --show
+# 2. オンラインツール: Laravel Key Generator で検索
+# 例: base64:abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQR=
+app_key = "base64:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+
+# SSL/ドメイン設定（オプション）
+# -----------------------------------------------------------------------------
+
+# カスタムドメイン名（オプション）
+# 独自ドメインを使用する場合のみ設定
+# 例: "example.com", "api.myapp.com"
+# 空の場合はGoogle CloudのIPアドレスが使用されます
+# domain_name = "example.com"
+
+# SSL証明書の有効化（true/false）
+# カスタムドメインを設定した場合はtrueを推奨
+# IPアドレスのみの場合はfalseを推奨
+# enable_ssl = true
+
+# リソース管理用ラベル（オプション）
+# -----------------------------------------------------------------------------
+
+# 全リソースに適用するラベル（コスト管理、組織化用）
+# 例：チーム名、プロジェクト名、コストセンターなど
+labels = {
+  team        = "development"      # 開発チーム
+  cost_center = "engineering"      # コストセンター
+  project     = "laravel-demo"     # プロジェクト名
+  owner       = "user@example.com" # 管理者
+}
+
+# =============================================================================
+# 設定完了後の次のステップ
+# =============================================================================
+# 1. terraform init     : Terraformの初期化
+# 2. terraform plan     : 実行計画の確認
+# 3. terraform apply    : インフラストラクチャの作成
+# 4. GitHubとの連携設定 : Cloud Build トリガーの確認
+#
+# 詳細な手順については README.md を参照してください。
