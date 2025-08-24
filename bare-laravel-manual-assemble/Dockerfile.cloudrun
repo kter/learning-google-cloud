@@ -57,6 +57,14 @@ RUN mkdir -p /var/www/storage/logs && \
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 RUN chmod -R 775 /var/www/storage /var/www/bootstrap/cache
 
+# Set environment variables for stateless Cloud Run deployment
+ENV DB_CONNECTION=null
+ENV SESSION_DRIVER=array
+ENV CACHE_STORE=array
+ENV QUEUE_CONNECTION=sync
+ENV LOG_CHANNEL=stdout
+ENV APP_ENV=production
+
 # Expose port 8080 for Cloud Run
 EXPOSE 8080
 
