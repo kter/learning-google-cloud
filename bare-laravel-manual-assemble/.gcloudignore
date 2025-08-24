@@ -46,6 +46,10 @@ docker-compose.yml
 docker-compose.*.yml
 Dockerfile.backup
 
-# Documentation
-README.md
-*.md
+# Include required files for Cloud Build
+!Dockerfile.cloudrun
+!cloudbuild.yaml
+
+# Documentation (keeping README.md for deployment reference)
+# README.md
+# *.md
