@@ -1,4 +1,18 @@
 steps:
+  # Debug: List files in workspace
+  - name: 'ubuntu'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        echo "=== Listing all files in /workspace ==="
+        ls -la /workspace/
+        echo "=== Looking for Dockerfile* files ==="
+        find /workspace -name "Dockerfile*" -type f
+        echo "=== Checking .gcloudignore ==="
+        cat /workspace/.gcloudignore || echo "No .gcloudignore found"
+    id: 'debug-files'
+
   # Build Laravel application image
   - name: 'gcr.io/cloud-builders/docker'
     args:
@@ -11,6 +25,7 @@ steps:
       - 'Dockerfile.cloudrun'
       - '.'
     id: 'build-app'
+    waitFor: ['debug-files']
 
   # Push image to Artifact Registry
   - name: 'gcr.io/cloud-builders/docker'
