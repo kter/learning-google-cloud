@@ -22,8 +22,8 @@ steps:
       - '-t'
       - 'asia-northeast1-docker.pkg.dev/$PROJECT_ID/laravel-repo/laravel-app:latest'
       - '-f'
-      - 'Dockerfile.cloudrun'
-      - '.'
+      - 'bare-laravel-manual-assemble/Dockerfile.cloudrun'
+      - 'bare-laravel-manual-assemble'
     id: 'build-app'
     waitFor: ['debug-files']
 
@@ -43,6 +43,8 @@ steps:
 images:
   - 'asia-northeast1-docker.pkg.dev/$PROJECT_ID/laravel-repo/laravel-app:$SHORT_SHA'
   - 'asia-northeast1-docker.pkg.dev/$PROJECT_ID/laravel-repo/laravel-app:latest'
+
+# Note: All files are in bare-laravel-manual-assemble/ subdirectory
 
 options:
   logging: CLOUD_LOGGING_ONLY
